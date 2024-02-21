@@ -92,6 +92,16 @@ func (arr *array[T]) Get(index int) (T, error) {
 	return arr.arr[index], nil
 }
 
+// Set updates the element at a specific index from the array
+func (arr *array[T]) Set(index int, val T) error {
+	if index < 0 || index >= arr.size {
+		return errors.New("Index out of bounds")
+	}
+
+	arr.arr[index] = val
+	return nil
+}
+
 // IndexOf searches for an element in the array and returns its index
 func (arr *array[T]) IndexOf(element T) (int, error) {
 	for i := 0; i < arr.size; i++ {
@@ -110,4 +120,36 @@ func (arr *array[T]) PrintAll() {
 		fmt.Print(arr.arr[i], ", ")
 	}
 	fmt.Println(arr.arr[arr.size-1], "]")
+}
+
+// Merge merges the elements of the current array with another array.
+// The resulting array is returned along with an error if the combined size exceeds the maximum allowed size.
+// The merging process does not modify the original arrays.
+func (arr *array[T]) Merge(otherArr *array[T]) (array[T], error) {
+	// Create a new array to store the merged elements
+	res := New[T]()
+
+	// Copy elements from the current array to the result array
+	for i := 0; i < arr.size; i++ {
+		res.arr[i] = arr.arr[i]
+		res.size++
+	}
+
+	// Copy elements from the other array to the result array
+	// Stop if the maximum size is reached
+	for i := 0; i < otherArr.size; i++ {
+		res.arr[arr.size+i] = otherArr.arr[i]
+		res.size++
+		if res.size == ArrayMaxSize {
+			break
+		}
+	}
+
+	// Check if the combined size exceeds the maximum allowed size
+	if arr.size+otherArr.size > ArrayMaxSize {
+		return res, errors.New("Cannot fit both arrays completely")
+	}
+
+	// Return the merged array and nil error if successful
+	return res, nil
 }
